@@ -1,0 +1,25 @@
+spring:
+  application:
+    name: Karina
+server:
+  port: 9090
+app:
+  report:
+    timezone: "Asia/Almaty"
+    retention: 30d
+    include-charts: true
+  owner: Rakimzhanova Karina
+  group: IT1CCO-2503 IS
+  mail:
+    from: 43102@iitu.edu.kz
+    retry-count: 3
+    timeout: 5s
+    enabled: true
+logging:
+  level:
+    kz.iitu: INFO
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,env,configprops,conditions
