@@ -2,7 +2,7 @@ spring:
   application:
     name: Karina
 server:
-  port: 9090
+  port: 8080
 app:
   report:
     timezone: "Asia/Almaty"

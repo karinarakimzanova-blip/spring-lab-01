@@ -1,6 +1,7 @@
 package kz.iitu.springlab.service;
 
 import kz.iitu.springlab.audit.Audited;
+import kz.iitu.springlab.metrics.Measured;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -13,14 +14,16 @@ public class CatalogService {
 
     @Autowired
     @Lazy
-    private CatalogService self; // Самовнедрение для корректного вызова методов через Spring Proxy
+    private CatalogService self;
 
+    @Measured
     public String findById(long id) {
         sleep(50);
         return "Item no. " + id;
     }
 
     @Audited(action = "CATALOG_LIST", logArguments = true)
+    @Measured
     public List<String> findAll(int limit) {
         sleep(300);
         return IntStream.rangeClosed(1, limit)
@@ -29,6 +32,7 @@ public class CatalogService {
     }
 
     @Audited(action = "CATALOG_REMOVE")
+    @Measured
     public String remove(long id) {
         if (id <= 0) {
             throw new IllegalArgumentException("Invalid identifier: " + id);
@@ -36,17 +40,15 @@ public class CatalogService {
         return "Removed item no. " + id;
     }
 
+    @Measured
     public String removeTwice(long id) {
-        String first = self.remove(id);
+        String first  = self.remove(id);
         String second = self.remove(id + 1);
         return first + "; " + second;
     }
 
     private void sleep(long ms) {
-        try {
-            Thread.sleep(ms);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+        try { Thread.sleep(ms); }
+        catch (InterruptedException e) { Thread.currentThread().interrupt(); }
     }
 }
