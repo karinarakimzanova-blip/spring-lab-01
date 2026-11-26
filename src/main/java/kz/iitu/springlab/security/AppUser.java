@@ -27,7 +27,12 @@ public class AppUser {
     private Set<String> roles = new HashSet<>();
 
     protected AppUser() { }
-
+    public AppUser(String username, String passwordHash, boolean enabled, Set<String> roles) {
+        this.username = username;
+        this.passwordHash = passwordHash;
+        this.enabled = enabled;
+        this.roles = roles != null ? new HashSet<>(roles) : new HashSet<>();
+    }
     public Long getId() { return id; }
     public String getUsername() { return username; }
     public String getPasswordHash() { return passwordHash; }

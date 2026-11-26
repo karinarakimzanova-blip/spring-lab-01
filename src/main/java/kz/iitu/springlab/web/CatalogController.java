@@ -1,12 +1,17 @@
 package kz.iitu.springlab.web;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
 import kz.iitu.springlab.aspect.CallCounterAspect;
 import kz.iitu.springlab.service.CatalogService;
 import org.springframework.aop.support.AopUtils;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ProblemDetail;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/lab4")
@@ -20,9 +25,23 @@ public class CatalogController {
         this.callCounterAspect = callCounterAspect;
     }
 
+    public record ItemRequest(@NotBlank String title) { }
+
+    public record ItemResponse(long id, String title) { }
+
     @GetMapping("/item/{id}")
-    public String getItem(@PathVariable long id) {
-        return catalogService.findById(id);
+    public ItemResponse getItem(@PathVariable long id) {
+        String title = catalogService.findById(id);
+        if (title == null) {
+            throw new NoSuchElementException("Item not found: " + id);
+        }
+        return new ItemResponse(id, title);
+    }
+
+    @PostMapping("/items")
+    public ResponseEntity<ItemResponse> createItem(@Valid @RequestBody ItemRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(new ItemResponse(1L, request.title()));
     }
 
     @GetMapping("/items")
@@ -53,5 +72,12 @@ public class CatalogController {
     @GetMapping("/stats")
     public Map<String, Long> getStats() {
         return callCounterAspect.getCallCounts();
+    }
+
+    @ExceptionHandler(NoSuchElementException.class)
+    public ProblemDetail handleNotFound(NoSuchElementException ex) {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
+        problem.setTitle("Resource Not Found");
+        return problem;
     }
 }
