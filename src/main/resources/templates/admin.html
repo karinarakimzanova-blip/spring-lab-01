@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin</title>
+</head>
+<body>
+<h1>Администрирование</h1>
+
+<p>Вы вошли как <span sec:authentication="name">anonymous</span>,
+    права: <span sec:authentication="principal.authorities">[ROLE_USER]</span></p>
+
+<table border="1">
+    <tr><th>ID</th><th>Username</th><th>Roles</th><th>Enabled</th></tr>
+    <tr th:each="u : ${users}">
+        <td th:text="${u.id}"></td>
+        <td th:text="${u.username}"></td>
+        <td th:text="${u.roles}"></td>
+        <td th:text="${u.enabled}"></td>
+    </tr>
+</table>
+
+<p><a th:href="@{/books}">К каталогу</a></p>
+
+<form th:action="@{/logout}" method="post">
+    <button type="submit">Выйти</button>
+</form>
+</body>
+</html>
